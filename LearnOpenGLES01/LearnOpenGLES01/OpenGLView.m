@@ -11,6 +11,23 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 
+typedef struct {
+    float Position[3];
+    float Color[4];
+} Vertex;
+
+const Vertex Vertices[] = {
+    {{1, -1, 0}, {1, 0, 0, 1}},
+    {{1, 1, 0}, {0, 1, 0, 1}},
+    {{-1, 1, 0}, {0, 0, 1, 1}},
+    {{-1, -1, 0}, {0, 0, 0, 1}}
+};
+
+const GLubyte Indices[] = {
+    0, 1, 2,
+    2, 3, 0
+};
+
 @interface OpenGLView () {
     CAEAGLLayer* _eaglLayer;
     EAGLContext* _context;
@@ -32,9 +49,24 @@
         [self setupRenderBuffer];
         [self setupFrameBuffer];
         [self compileShaders];
+        [self setupVBOs];
         [self render];
     }
     return self;
+}
+
+- (void)setupVBOs {
+    
+    GLuint vertexBuffer;
+    glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+    
+    GLuint indexBuffer;
+    glGenBuffers(1, &indexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
+    
 }
 
 - (void)setupLayer {
@@ -71,9 +103,50 @@
 }
 
 - (void)render {
-    glClearColor(0, 104.0/255.0, 55.0/255.0, 1.0);  //设置一个RGB颜色和透明度
-    glClear(GL_COLOR_BUFFER_BIT);                   //“填色”动作，GL_COLOR_BUFFER_BIT声明要清理那个缓冲区
-    [_context presentRenderbuffer:GL_RENDERBUFFER]; //将缓冲区（render buffer和color buffer）的颜色呈现到UIView上
+    glClearColor(0, 104.0/255.0, 55.0/255.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    // 1    调用glViewport 设置UIView中用于渲染的部分
+    glViewport(0, 0, self.frame.size.width, self.frame.size.height);
+    
+    // 2    调用glVertexAttribPointer来为vertex shader的两个输入参数配置两个合适的值。
+    glVertexAttribPointer(_positionSlot, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex), 0);
+    glVertexAttribPointer(_colorSlot, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex), (GLvoid*) (sizeof(float) *3));
+    /*
+     上面是一个很重要的方法，让我们来认真地看看它是如何工作的：
+     
+     　　·第一个参数，声明这个属性的名称，之前我们称之为glGetAttribLocation
+     
+     　　·第二个参数，定义这个属性由多少个值组成。譬如说position是由3个float（x,y,z）组成，而颜色是4个float（r,g,b,a）
+     
+     　　·第三个，声明每一个值是什么类型。（这例子中无论是位置还是颜色，我们都用了GL_FLOAT）
+     
+     　　·第四个，嗯……它总是false就好了。
+     
+     　　·第五个，指 stride 的大小。这是一个种描述每个 vertex数据大小的方式。所以我们可以简单地传入 sizeof（Vertex），让编译器计算出来就好。
+     
+     　　·最好一个，是这个数据结构的偏移量。表示在这个结构中，从哪里开始获取我们的值。Position的值在前面，所以传0进去就可以了。而颜色是紧接着位置的数据，而position的大小是3个float的大小，所以是从 3 * sizeof(float) 开始的。
+     */
+    
+    
+    // 3   调用glDrawElements ，它最后会在每个vertex上调用我们的vertex shader，以及每个像素调用fragment shader，最终画出我们的矩形。
+    glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
+                   GL_UNSIGNED_BYTE, 0);
+    /*
+     它也是一个重要的方法，我们来仔细研究一下：
+     
+     　　·第一个参数，声明用哪种特性来渲染图形。有GL_LINE_STRIP 和 GL_TRIANGLE_FAN。然而GL_TRIANGLE是最常用的，特别是与VBO 关联的时候。
+     
+     　　·第二个，告诉渲染器有多少个图形要渲染。我们用到C的代码来计算出有多少个。这里是通过个 array的byte大小除以一个Indice类型的大小得到的。
+     
+     　　·第三个，指每个indices中的index类型
+     
+     　　·最后一个，在官方文档中说，它是一个指向index的指针。但在这里，我们用的是VBO，所以通过index的array就可以访问到了（在GL_ELEMENT_ARRAY_BUFFER传过了），所以这里不需要.
+     */
+    
+    [_context presentRenderbuffer:GL_RENDERBUFFER];
 }
 
 + (Class)layerClass {
