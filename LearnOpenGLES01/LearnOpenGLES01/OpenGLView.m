@@ -17,11 +17,12 @@ typedef struct {
     float Color[4];
 } Vertex;
 
+
 const Vertex Vertices[] = {
-    {{1, -1, -7}, {1, 0, 0, 1}},
-    {{1, 1, -7}, {0, 1, 0, 1}},
-    {{-1, 1, -7}, {0, 0, 1, 1}},
-    {{-1, -1, -7}, {0, 0, 0, 1}}
+    {{1, -1, 0}, {1, 0, 0, 1}},
+    {{1, 1, 0}, {0, 1, 0, 1}},
+    {{-1, 1, 0}, {0, 0, 1, 1}},
+    {{-1, -1, 0}, {0, 0, 0, 1}}
 };
 
 const GLubyte Indices[] = {
@@ -36,6 +37,8 @@ const GLubyte Indices[] = {
     GLuint _positionSlot;
     GLuint _colorSlot;
     GLuint _projectionUniform;
+    GLuint _modelViewUniform;
+    float _currentRotation;
 }
 
 @end
@@ -52,7 +55,7 @@ const GLubyte Indices[] = {
         [self setupFrameBuffer];
         [self compileShaders];
         [self setupVBOs];
-        [self render];
+        [self setupDisplayLink];
     }
     return self;
 }
@@ -104,7 +107,7 @@ const GLubyte Indices[] = {
                               GL_RENDERBUFFER, _colorRenderBuffer);   // 把前面创建的buffer render依附在frame buffer的GL_COLOR_ATTACHMENT0位置上。
 }
 
-- (void)render {
+- (void)render:(CADisplayLink*)displayLink {
     glClearColor(0, 104.0/255.0, 55.0/255.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
     
@@ -112,6 +115,13 @@ const GLubyte Indices[] = {
     float h =4.0f* self.frame.size.height / self.frame.size.width;
     [projection populateFromFrustumLeft:-2 andRight:2 andBottom:-h/2 andTop:h/2 andNear:4 andFar:10];
     glUniformMatrix4fv(_projectionUniform, 1, 0, projection.glMatrix);//你用来把数据传入到vertex shader的方式，叫做 glUniformMatrix4fv. 这个CC3GLMatrix类有一个很方便的方法 glMatrix,来把矩阵转换成OpenGL的array格式。
+    
+    CC3GLMatrix *modelView = [CC3GLMatrix matrix];
+    [modelView populateFromTranslation:CC3VectorMake(sin(CACurrentMediaTime()), 0, -7)];
+    _currentRotation += displayLink.duration *90;
+    [modelView rotateBy:CC3VectorMake(_currentRotation, _currentRotation, 0)];
+    glUniformMatrix4fv(_modelViewUniform, 1, 0, modelView.glMatrix);
+    
     
     // 1    调用glViewport 设置UIView中用于渲染的部分
     glViewport(0, 0, self.frame.size.width, self.frame.size.height);
@@ -195,6 +205,7 @@ const GLubyte Indices[] = {
     glEnableVertexAttribArray(_colorSlot);
     
     _projectionUniform = glGetUniformLocation(programHandle, "Projection"); //通过调用  glGetUniformLocation 来获取在vertex shader中的Projection输入变量
+    _modelViewUniform = glGetUniformLocation(programHandle, "Modelview");
 }
 
 - (GLuint)compileShader:(NSString*)shaderName withType:(GLenum)shaderType {
@@ -233,6 +244,11 @@ const GLubyte Indices[] = {
     }
     
     return shaderHandle;
+}
+
+- (void)setupDisplayLink {
+    CADisplayLink* displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(render:)];
+    [displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
 - (void)dealloc
