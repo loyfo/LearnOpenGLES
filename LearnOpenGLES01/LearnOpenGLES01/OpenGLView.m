@@ -17,7 +17,7 @@ typedef struct {
     float Color[4];
 } Vertex;
 
-
+/*
 const Vertex Vertices[] = {
     {{1, -1, 0}, {1, 0, 0, 1}},
     {{1, 1, 0}, {0, 1, 0, 1}},
@@ -29,6 +29,39 @@ const GLubyte Indices[] = {
     0, 1, 2,
     2, 3, 0
 };
+*/
+
+const Vertex Vertices[] = {
+    {{1, -1, 0}, {1, 0, 0, 1}},
+    {{1, 1, 0}, {1, 0, 0, 1}},
+    {{-1, 1, 0}, {0, 1, 0, 1}},
+    {{-1, -1, 0}, {0, 1, 0, 1}},
+    {{1, -1, -1}, {1, 0, 0, 1}},
+    {{1, 1, -1}, {1, 0, 0, 1}},
+    {{-1, 1, -1}, {0, 1, 0, 1}},
+    {{-1, -1, -1}, {0, 1, 0, 1}}
+};
+
+const GLubyte Indices[] = {
+    // Front
+    0, 1, 2,
+    2, 3, 0,
+    // Back
+    4, 6, 5,
+    4, 7, 6,
+    // Left
+    2, 7, 3,
+    7, 6, 2,
+    // Right
+    0, 4, 1,
+    4, 1, 5,
+    // Top
+    6, 2, 1,
+    1, 6, 5,
+    // Bottom
+    0, 3, 7,
+    0, 7, 4    
+};
 
 @interface OpenGLView () {
     CAEAGLLayer* _eaglLayer;
@@ -39,6 +72,7 @@ const GLubyte Indices[] = {
     GLuint _projectionUniform;
     GLuint _modelViewUniform;
     float _currentRotation;
+    GLuint _depthRenderBuffer;
 }
 
 @end
@@ -51,6 +85,7 @@ const GLubyte Indices[] = {
     if (self) {
         [self setupLayer];
         [self setupContext];
+         [self setupDepthBuffer]; //深度测试
         [self setupRenderBuffer];
         [self setupFrameBuffer];
         [self compileShaders];
@@ -164,6 +199,9 @@ const GLubyte Indices[] = {
      */
     
     [_context presentRenderbuffer:GL_RENDERBUFFER];
+    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 我们在每次update时都清除深度buffer，并启用depth  testing。
+    glEnable(GL_DEPTH_TEST);
 }
 
 + (Class)layerClass {
@@ -254,6 +292,14 @@ const GLubyte Indices[] = {
 - (void)dealloc
 {
     _context = nil;
+}
+
+- (void)setupDepthBuffer {      // 创建了一个depth buffer,注意这里使用了glRenderbufferStorage, 而不是context的renderBufferStorage（这个是在OpenGL的view中特别为color render buffer而设的）
+    glGenRenderbuffers(1, &_depthRenderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, _depthRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, self.frame.size.width, self.frame.size.height);
+    
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRenderBuffer); //使用glFramebufferRenderbuffer，来关联depth buffer和render buffer
 }
 
 @end
