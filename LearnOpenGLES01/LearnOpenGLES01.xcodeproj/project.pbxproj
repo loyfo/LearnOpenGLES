@@ -18,6 +18,10 @@
 		F9E919B91EA752E800731FDE /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9E919B81EA752E800731FDE /* QuartzCore.framework */; };
 		F9E919BD1EA763A900731FDE /* SimpleFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = F9E919BC1EA763A900731FDE /* SimpleFragment.glsl */; };
 		F9E919BF1EA767E200731FDE /* SimpleVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = F9E919BE1EA767E200731FDE /* SimpleVertex.glsl */; };
+		F9E91A091EA8B19800731FDE /* CC3Foundation.m in Sources */ = {isa = PBXBuildFile; fileRef = F9E91A001EA8B19800731FDE /* CC3Foundation.m */; };
+		F9E91A0A1EA8B19800731FDE /* CC3GLMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = F9E91A021EA8B19800731FDE /* CC3GLMatrix.m */; };
+		F9E91A0B1EA8B19800731FDE /* CC3Kazmath.c in Sources */ = {isa = PBXBuildFile; fileRef = F9E91A031EA8B19800731FDE /* CC3Kazmath.c */; };
+		F9E91A0C1EA8B19800731FDE /* CC3Math.m in Sources */ = {isa = PBXBuildFile; fileRef = F9E91A071EA8B19800731FDE /* CC3Math.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +41,16 @@
 		F9E919B81EA752E800731FDE /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		F9E919BC1EA763A900731FDE /* SimpleFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleFragment.glsl; sourceTree = "<group>"; };
 		F9E919BE1EA767E200731FDE /* SimpleVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleVertex.glsl; sourceTree = "<group>"; };
+		F9E919FF1EA8B19800731FDE /* CC3Foundation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CC3Foundation.h; sourceTree = "<group>"; };
+		F9E91A001EA8B19800731FDE /* CC3Foundation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CC3Foundation.m; sourceTree = "<group>"; };
+		F9E91A011EA8B19800731FDE /* CC3GLMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CC3GLMatrix.h; sourceTree = "<group>"; };
+		F9E91A021EA8B19800731FDE /* CC3GLMatrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CC3GLMatrix.m; sourceTree = "<group>"; };
+		F9E91A031EA8B19800731FDE /* CC3Kazmath.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CC3Kazmath.c; sourceTree = "<group>"; };
+		F9E91A041EA8B19800731FDE /* CC3Kazmath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CC3Kazmath.h; sourceTree = "<group>"; };
+		F9E91A051EA8B19800731FDE /* CC3Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CC3Logging.h; sourceTree = "<group>"; };
+		F9E91A061EA8B19800731FDE /* CC3Math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CC3Math.h; sourceTree = "<group>"; };
+		F9E91A071EA8B19800731FDE /* CC3Math.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CC3Math.m; sourceTree = "<group>"; };
+		F9E91A081EA8B19800731FDE /* ccTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ccTypes.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +86,7 @@
 		F95C3A881EA46D1E00F1FA30 /* LearnOpenGLES01 */ = {
 			isa = PBXGroup;
 			children = (
+				F9E919FE1EA8B19800731FDE /* Cocos3DMathLib */,
 				F95C3A8C1EA46D1E00F1FA30 /* AppDelegate.h */,
 				F95C3A8D1EA46D1E00F1FA30 /* AppDelegate.m */,
 				F95C3A8F1EA46D1E00F1FA30 /* ViewController.h */,
@@ -104,6 +119,23 @@
 				F9E919B61EA752DA00731FDE /* OpenGLES.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F9E919FE1EA8B19800731FDE /* Cocos3DMathLib */ = {
+			isa = PBXGroup;
+			children = (
+				F9E919FF1EA8B19800731FDE /* CC3Foundation.h */,
+				F9E91A001EA8B19800731FDE /* CC3Foundation.m */,
+				F9E91A011EA8B19800731FDE /* CC3GLMatrix.h */,
+				F9E91A021EA8B19800731FDE /* CC3GLMatrix.m */,
+				F9E91A031EA8B19800731FDE /* CC3Kazmath.c */,
+				F9E91A041EA8B19800731FDE /* CC3Kazmath.h */,
+				F9E91A051EA8B19800731FDE /* CC3Logging.h */,
+				F9E91A061EA8B19800731FDE /* CC3Math.h */,
+				F9E91A071EA8B19800731FDE /* CC3Math.m */,
+				F9E91A081EA8B19800731FDE /* ccTypes.h */,
+			);
+			path = Cocos3DMathLib;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -180,10 +212,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F9E91A0B1EA8B19800731FDE /* CC3Kazmath.c in Sources */,
 				F95C3A911EA46D1E00F1FA30 /* ViewController.m in Sources */,
 				F95C3A8E1EA46D1E00F1FA30 /* AppDelegate.m in Sources */,
 				F95C3A8B1EA46D1E00F1FA30 /* main.m in Sources */,
+				F9E91A091EA8B19800731FDE /* CC3Foundation.m in Sources */,
 				F9E919B41EA752A700731FDE /* OpenGLView.m in Sources */,
+				F9E91A0A1EA8B19800731FDE /* CC3GLMatrix.m in Sources */,
+				F9E91A0C1EA8B19800731FDE /* CC3Math.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

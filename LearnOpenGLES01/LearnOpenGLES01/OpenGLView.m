@@ -10,6 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
+#import "CC3GLMatrix.h"
 
 typedef struct {
     float Position[3];
@@ -17,10 +18,10 @@ typedef struct {
 } Vertex;
 
 const Vertex Vertices[] = {
-    {{1, -1, 0}, {1, 0, 0, 1}},
-    {{1, 1, 0}, {0, 1, 0, 1}},
-    {{-1, 1, 0}, {0, 0, 1, 1}},
-    {{-1, -1, 0}, {0, 0, 0, 1}}
+    {{1, -1, -7}, {1, 0, 0, 1}},
+    {{1, 1, -7}, {0, 1, 0, 1}},
+    {{-1, 1, -7}, {0, 0, 1, 1}},
+    {{-1, -1, -7}, {0, 0, 0, 1}}
 };
 
 const GLubyte Indices[] = {
@@ -34,6 +35,7 @@ const GLubyte Indices[] = {
     GLuint _colorRenderBuffer;
     GLuint _positionSlot;
     GLuint _colorSlot;
+    GLuint _projectionUniform;
 }
 
 @end
@@ -105,6 +107,11 @@ const GLubyte Indices[] = {
 - (void)render {
     glClearColor(0, 104.0/255.0, 55.0/255.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
+    
+    CC3GLMatrix *projection = [CC3GLMatrix matrix]; //使用math library来创建投影矩阵。通过这个让你指定坐标，以及远近屏位置的方式，来创建矩阵，会让事情比较简单。
+    float h =4.0f* self.frame.size.height / self.frame.size.width;
+    [projection populateFromFrustumLeft:-2 andRight:2 andBottom:-h/2 andTop:h/2 andNear:4 andFar:10];
+    glUniformMatrix4fv(_projectionUniform, 1, 0, projection.glMatrix);//你用来把数据传入到vertex shader的方式，叫做 glUniformMatrix4fv. 这个CC3GLMatrix类有一个很方便的方法 glMatrix,来把矩阵转换成OpenGL的array格式。
     
     // 1    调用glViewport 设置UIView中用于渲染的部分
     glViewport(0, 0, self.frame.size.width, self.frame.size.height);
@@ -186,6 +193,8 @@ const GLubyte Indices[] = {
     _colorSlot = glGetAttribLocation(programHandle, "SourceColor");
     glEnableVertexAttribArray(_positionSlot);
     glEnableVertexAttribArray(_colorSlot);
+    
+    _projectionUniform = glGetUniformLocation(programHandle, "Projection"); //通过调用  glGetUniformLocation 来获取在vertex shader中的Projection输入变量
 }
 
 - (GLuint)compileShader:(NSString*)shaderName withType:(GLenum)shaderType {
